@@ -2,6 +2,61 @@
 
 {% block content %}
 
-{{content}}
+    <div class="preview-container">
+        <div class="readme-container">
+            {% for line in content %}
+
+                {% if line.type == 'title' %}
+
+                    <span class="title" 
+                    {% if line.arg == 'h1' %}
+                        style="color: var(--highlight-top);">
+                        <{{ line.arg }}><b>{{ line.text }}</b></{{ line.arg }}>
+                    
+                    {% else %}
+                        
+                        ><{{ line.arg }}>{{ line.text }}</{{ line.arg }}>
+
+                    {% endif %}
+                        
+                    </span>
+
+                {% endif %}
+
+                {% if line.type == 'text' %}
+
+                    {% for section in line.text %}
+
+                        <span class="content">
+                            {{ section.text }}
+                        </span>
+
+                            {% if section.link %}
+
+                                <a style="color: var(--highlight-top);" href={{ section.link.ref }}>{{ section.link.name }}</a>
+
+                            {% endif %}
+                    
+                    
+                    {% endfor %}
+
+                {% endif %}
+
+                {% if line.type == 'code' %}
+
+                    <div class="code-container">
+                        <span class="language-specification">
+                            <p><b>{{ line.arg }}</b></p>
+                        </span>
+                        <span class="code-text">
+                            <p style="white-space: pre-line">{{line.text}}</p>
+                        </span>
+                    </div>
+
+                {% endif %}
+
+            {% endfor %}
+        </div>
+    </div>
 
 {% endblock content %}

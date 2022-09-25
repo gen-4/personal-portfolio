@@ -61,7 +61,7 @@ class Markdown:
             name = name.split('[')[1]
             reference = reference.split(')')[0]
 
-            line = line[:found.start()] + f"<a href={reference}>{name}</a>" + line[found.end():]
+            line = line[:found.start()] + f'<a href="{reference}">{name}</a>' + line[found.end():]
 
         return line
 

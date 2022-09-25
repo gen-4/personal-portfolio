@@ -2,8 +2,23 @@
 
 {% block content %}
 
-{% for project in projects %}
-    <a href={{project.url}}><p>{{project.title}}</p></a>
-{% endfor %}
+    <div class="bio">
+        <div class="bio-text">
+            <h2 class="bio-title">Hi! I'm Antón and I'm a DevOps computer engineer</h2>
+            <p>I'm currently working at Linknovate startup based in Galicia, Spain.</p>
+        </div>
+    </div>
+
+    <div class="directory">
+        <h2 class="bio-title">Projects</h2>
+        
+        {% for project in projects %}
+            <a class="directory-row" href={{project.url}}>
+                <div>
+                    <h3>{{ project.title }}</h3>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
 
 {% endblock content %}

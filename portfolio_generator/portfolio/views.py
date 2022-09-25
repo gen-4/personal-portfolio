@@ -38,19 +38,28 @@ def get_main_page(request):
     return render(request, 'index.html', context)
 
 
-def _handle_title(text, lvl):
-    return f"<h{lvl}>{text}</h{lvl}>"
-
-def _handle_code(text, language):
-    return f"<p>{text}</p>"
-
 def _parse_line(line):
-    if not line:
-        return None
+    parts = line.split('</a>')
+    if len(parts) == 1 and not parts[0].__contains__('<a'):
+        return [{'text': parts[0]}]
 
-    if line[1] == 'title': return _handle_title(line[0], line[2]) + '\n'
-    if line[1] == 'text': return line[0] + '\n'
-    if line[1] == 'code': return _handle_code(line[0], line[2])+ '\n'
+    link = parts[0]
+    rest = '</a>'.join(parts[1:])
+        
+    text, link = link.split('<a ')
+    href, name = link.split('">', 1)
+    ref = href.split('="')[1]
+
+    return [
+        {
+            'text': text,
+            'link': {
+                'ref': ref,
+                'name': name
+            },
+        }
+    ] + _parse_line(rest)
+
 
 def get_project(request, project_name):
     file = None
@@ -67,13 +76,25 @@ def get_project(request, project_name):
         raise Http404
 
     reader = Markdown(file.path)
-    doc = ''
-    line = 'content'
+    doc = []
+    line = True
     while line:
-        line = _parse_line(reader.read_line())
+        text, typ, arg = reader.read_line()
+        if typ == 'title': arg = f'h{arg}'
+        if typ == 'text': 
+            if text == '\n': continue
+            text = _parse_line(text)
+            
+        line = {
+            'text': text,
+            'type': typ,
+            'arg': arg
+        }
 
-        if line:
-            doc += line
+        if not text:
+            line = None
+        else:
+            doc.append(line)
 
     context = {'content': doc}
 
