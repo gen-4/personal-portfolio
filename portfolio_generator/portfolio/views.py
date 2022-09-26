@@ -38,29 +38,6 @@ def get_main_page(request):
     return render(request, 'index.html', context)
 
 
-def _parse_line(line):
-    parts = line.split('</a>')
-    if len(parts) == 1 and not parts[0].__contains__('<a'):
-        return [{'text': parts[0]}]
-
-    link = parts[0]
-    rest = '</a>'.join(parts[1:])
-        
-    text, link = link.split('<a ')
-    href, name = link.split('">', 1)
-    ref = href.split('="')[1]
-
-    return [
-        {
-            'text': text,
-            'link': {
-                'ref': ref,
-                'name': name
-            },
-        }
-    ] + _parse_line(rest)
-
-
 def get_project(request, project_name):
     file = None
 
@@ -83,7 +60,6 @@ def get_project(request, project_name):
         if typ == 'title': arg = f'h{arg}'
         if typ == 'text': 
             if text == '\n': continue
-            text = _parse_line(text)
             
         line = {
             'text': text,

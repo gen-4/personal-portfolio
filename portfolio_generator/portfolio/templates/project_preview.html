@@ -24,21 +24,22 @@
                 {% endif %}
 
                 {% if line.type == 'text' %}
-
-                    {% for section in line.text %}
-
-                        <span class="content">
-                            {{ section.text }}
-                        </span>
-
-                            {% if section.link %}
-
-                                <a style="color: var(--highlight-top);" href={{ section.link.ref }}>{{ section.link.name }}</a>
-
-                            {% endif %}
                     
-                    
-                    {% endfor %}
+                    <span class="content">
+                        {% for section in line.text %}
+
+                                {{ section.text }}
+                            
+
+                                {% if section.link %}
+
+                                    <a style="color: var(--highlight-top);" href={{ section.link.ref }}>{{ section.link.name }}</a>
+
+                                {% endif %}
+                        
+                        
+                        {% endfor %}
+                    </span>
 
                 {% endif %}
 

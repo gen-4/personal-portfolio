@@ -55,21 +55,49 @@ class Markdown:
         return text, 'code', language
 
     def _transform_reference(self, line: str) -> str:
-        found = re.search('\[.+\]\(.+\)', line)
+        result = []
+        found = re.findall('\[(.*?)]\((.*?)\)', line)
         if found:
-            name, reference = line.split('](', 1)
-            name = name.split('[')[1]
-            reference = reference.split(')')[0]
+            result_parts = []
+            line = (' ' + line + ' ')
+            for (name, ref) in found:
+                parts = line.split(f'[{name}]({ref})')
+                result_parts.append(parts[0])
+                line = f'[{name}]({ref})'.join(parts[1:])
 
-            line = line[:found.start()] + f'<a href="{reference}">{name}</a>' + line[found.end():]
+            result_parts.append(line)
+            
+            for i, (name, ref) in enumerate(found):
+                last = None
+                if i == 0:
+                    text = result_parts[i].lstrip()
 
-        return line
+                else:
+                    text = result_parts[i]
+
+                if i == len(found) - 1:
+                    if len(found) < len(result_parts):
+                        last = result_parts[i + 1]
+
+                result += [{
+                    'text': text,
+                    'link': {
+                        'name': name,
+                        'ref': ref
+                    }
+                }]
+                if last:
+                    result += [{'text': last}]
+
+            return result
+
+        result.append({'text': line})
+        return result
 
     def read_line(self) -> Tuple[str, str, str]:
         if self.size <= self.bytes_read: return None, 'end', None
         line = self.file.readline()
         self.bytes_read = self.file.tell()
-        line = self._transform_reference(line)
 
         result_tuple = None
         if line.startswith('#'):
@@ -79,7 +107,7 @@ class Markdown:
             result_tuple = self._parse_code(line)
 
         else: 
-            result_tuple = line, 'text', ''
+            result_tuple = self._transform_reference(line), 'text', ''
 
         self._print_remaining()
 
